@@ -1,7 +1,7 @@
 <?php
 require_once "./Utilities.php";
 
-$parsed = new ParseArg();
+$parsed = new Utilities();
 $arguments = $parsed->argv;
 
 foreach($arguments as $key=>$val)

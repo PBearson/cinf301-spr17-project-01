@@ -20,12 +20,12 @@ class Utilities
 		{
 			$val = $a[$i];
 			
-			//A single-dash followed by a single letter
+			//A single-dash followed by a value/list of values
 			if($val[0] == "-" and $val[1] != "-")
 			{
 				//A single-dash that is self-contained
 				//Example: '-v'
-				if($a[$i + 1] == null or $a[$i + 1][0] == "-")
+				if($i + 1 >= sizeof($a) or $a[$i + 1][0] == "-")
 				{
 					$args[$val[1]] = 'true';
 				}
