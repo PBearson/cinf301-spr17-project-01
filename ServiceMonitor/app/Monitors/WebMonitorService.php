@@ -1,14 +1,12 @@
 <?php
 
+require_once __DIR__ . '/MonitorService.php';
+
 class WebMonitorService extends MonitorService
-{
-	function __construct()
+{	
+	public function execute()
 	{
-		
-	}
-	
-	function execute()
-	{
-		print("Hi");
+		print("Executing Web\n");
+		print("Server name: " . $this->service . "\n");
 	}
 }

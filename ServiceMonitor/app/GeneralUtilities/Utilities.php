@@ -1,4 +1,5 @@
 <?php
+
 class Utilities
 {	
 	public function __get($key)

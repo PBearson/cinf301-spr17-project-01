@@ -1,5 +1,12 @@
-<?php 
+<?php
 
-use Monolog\Logger;
+require_once './MonitorService.php';
 
-$logger = new Logger("hi");
+class PortMonitorService extends MonitorService
+{
+	public function execute()
+	{
+		print("Executing Port\n");
+		print("Server name: " . $this->service . "\n");
+	}
+}

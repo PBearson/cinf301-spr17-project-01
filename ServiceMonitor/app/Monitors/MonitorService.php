@@ -9,40 +9,40 @@
 abstract class MonitorService
 {
 	//The service name
-	private $service;
+	protected $service;
 	
 	//The port or web link
-	private $link;
+	protected $link;
 	
 	//Present status - RUNNING or NOT_RESPONDING
-	private $status;
+	protected $status;
 	
 	//Attempt number - 1, 2, 3
-	private $attempt;
+	protected $attempt;
 	
 	//Attempt state - INFO, WARNING, CRITICAL
-	private $state;
+	protected $state;
 	
 	//Time (in minutes) between checks
-	private $frequency;
+	protected $frequency;
 	
 	//Time between checks of NOT_RESPONDING services
 	
-	private $interval;
+	protected $interval;
 	
 	/**
 	 * Execute the service - to be implemented inPortMonitorService
 	 * and WebMonitorService
 	 */
-	abstract protected function execute();
+	abstract public function execute();
 	
 	/**
 	 * Construct a new web or port monitor service
-	 * @param unknown $data can include information about
+	 * @param array $data can include information about
 	 * the service, link, frequency, and interval
 	 * (Will only work if declared as  an array)
 	 */
-	public function __construct($data = null)
+	public function __construct(array $data = NULL)
 	{
 		if(!is_array($data)) return;
 		if(isset($data['service'])) $this->service = $data['service'];
