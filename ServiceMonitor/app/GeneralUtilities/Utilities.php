@@ -41,7 +41,23 @@ class Utilities
 				//Example: -l Bryan,Kim,Austin
 				else 
 				{
-					
+					$subargs = $a[$i + 1];
+					$subargsarr = array();
+					$currarg = "";
+					for($j = 0; $j <= strlen($subargs); $j++)
+					{
+						$char = substr($subargs, $j, 1);
+						if($char == "," or $j == strlen($subargs))
+						{
+							array_push($subargsarr, $currarg);
+							$currarg = "";
+						}
+						else
+						{
+							$currarg .= $char;
+						}
+					}
+					$args[$val[1]] = $subargsarr;
 				}
 			}
 		}
