@@ -76,6 +76,28 @@ class Utilities
 				{
 					$args[$key] = $arg;
 				}
+				
+				//Argument is an array
+				//Example --names=Austin,Duncan,Eddie
+				else
+				{
+					$argsarr = array();
+					$currarg = "";
+					for($j = 0; $j <= strlen($arg); $j++)
+					{
+						$char = substr($arg, $j, 1);
+						if($char == "," or $j == strlen($arg))
+						{
+							array_push($argsarr, $currarg);
+							$currarg = "";
+						}
+						else
+						{
+							$currarg .= $char;
+						}
+					}
+					$args[$key] = $argsarr;
+				}
 			}
 		}
 		return $args;
