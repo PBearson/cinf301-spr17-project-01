@@ -60,6 +60,23 @@ class Utilities
 					$args[$val[1]] = $subargsarr;
 				}
 			}
+			
+			//A double dash followed by a value/list of values
+			else if ($val[0] == "-" and $val[1] == "-")
+			{
+				//Get the value to the left of the = sign
+				$key = substr($val, 2, strpos($val, "=") - 2);
+				
+				//Get the value to the right of the sign
+				$arg = substr($val, strpos($val, "=") + 1, strlen($val));
+				
+				//Argument is a string
+				//Example: --type=gold
+				if(!strpos($arg, ","))
+				{
+					$args[$key] = $arg;
+				}
+			}
 		}
 		return $args;
 	}
