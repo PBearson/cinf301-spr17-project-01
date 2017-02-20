@@ -35,4 +35,22 @@ abstract class MonitorService
 	 * and WebMonitorService
 	 */
 	abstract protected function execute();
+	
+	/**
+	 * Construct a new web or port monitor service
+	 * @param unknown $data can include information about
+	 * the service, link, frequency, and interval
+	 * (Will only work if declared as  an array)
+	 */
+	public function __construct($data = null)
+	{
+		if(!is_array($data)) return;
+		if(isset($data['service'])) $this->service = $data['service'];
+		if(isset($data['link'])) $this->link = $data['link'];
+		if (isset($data['frequency'])) $this->frequency = $data['frequency'];
+		if (isset($data['interval'])) $this->interval = $data['interval'];
+		$this->status = 'RUNNING';
+		$this->attempt = 1;
+		$this->state = 'INFO';
+	}
 }
