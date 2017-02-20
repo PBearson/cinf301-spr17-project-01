@@ -1,0 +1,13 @@
+[Unit]
+Description=Monitoring Service
+After=syslog.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/daemonize.pid
+ExecStartPre=/bin/rm -f /var/run/daemonize.pid
+ExecStart=/opt/daemonize.php --daemon --pidfile /var/run/daemonize.pid
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
