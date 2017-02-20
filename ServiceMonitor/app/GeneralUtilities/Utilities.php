@@ -1,10 +1,13 @@
 <?php
 class Utilities
 {	
-	public function __construct()
+	public function __get($key)
 	{
-		$args = $_SERVER['argv'];
-		$this->argv = $this->parse($args);
+		if($key == 'argv')
+		{
+			return $this->parse($_SERVER['argv']);
+		}
+		else return NULL;
 	}
 	
 	/**
