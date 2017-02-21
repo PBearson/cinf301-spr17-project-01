@@ -47,5 +47,13 @@
     			<interval>0.7</interval>
     		</paremeters>
     	</service>
+    	<service>
+    		<class>BlahNotAService</class>
+    		<paremeters>
+    			<name>IgnorePLS</name>
+    			<unknown>Unknown</unknown>
+    			<Life>42</Life>
+    		</paremeters>
+    	</service>
    	</services>
 </configuration>

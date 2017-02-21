@@ -1,6 +1,15 @@
 {
 	"minimum-stability": "stable",
-    "require": {
-        "monolog/monolog": "^1.22"
+    "require": 
+    {
+        "monolog/monolog": "^1.22"   
+    },
+    "autoload": 
+	{
+        "psr-4": 
+        {
+        	"App\\Monitors\\": "app/Monitors/",
+        	"App\\GeneralUtilities\\": "app/GeneralUtilities/"
+        }
     }
 }
