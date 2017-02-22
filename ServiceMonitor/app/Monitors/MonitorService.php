@@ -19,6 +19,7 @@ abstract class MonitorService
 	protected $name;
 	protected $link;
 	protected $logger;
+	protected $interval;
 	protected $shouldExit;
 	
 	/**
@@ -28,16 +29,16 @@ abstract class MonitorService
 	abstract public function execute();
 	
 	/**
-	 * Construct a new web or port monitor service
-	 * @param MonitorManager manager the referencing monitor manager
-	 * @param name the name of the service
-	 * @param link the web or port link
+	 * Construct a new Web or Service Monitor
+	 * @param MonitorManager $manager the parent monitor manager class
+	 * @param array $data the service data. Should include name, link, interval
 	 */
-	function __construct(MonitorManager $manager, string $name, string $link)
+	function __construct(MonitorManager $manager, array $data)
 	{
 		$this->manager = $manager;
-		$this->name = $name;
-		$this->link = $link;
+		$this->name = $data['name'];
+		$this->link = $data['link'];
+		$this->interval = $data['interval'];
 		$attempt = 0;
 		$shouldExit = false;
 		$this->logger = new Logger('service_logger');
@@ -50,6 +51,9 @@ abstract class MonitorService
 	 */
 	protected function handleResult(bool $success)
 	{
+		//Set up signal handlers
+		pcntl_signal(SIGALRM, "handle_signal");
+		
 		$link = $this->manager->OUTPUT_PATH;
 		
 		//Success: Log as INFO, child exits
@@ -67,6 +71,7 @@ abstract class MonitorService
 		//Fails, child exits
 		else
 		{
+			pcntl_alarm((double)$this->interval * 60);
 			$this->attempt++;
 			if($this->attempt < 3)
 			{
@@ -84,7 +89,21 @@ abstract class MonitorService
 			$this->logger->popHandler();
 		}
 	}
-		
+	
+	/**
+	 * Dispatch the signals
+	 * @param unknown $signo
+	 */
+	protected function handle_signal($signo)
+	{
+		switch($signo)
+		{
+			case "SIGALRM":
+				echo "Caught SIGALRM with signo " . $signo . "\n";
+				break;
+		}
+	}
+	
 	/**
 	 * See whether the child process is ready to exit or not
 	 * @return unknown

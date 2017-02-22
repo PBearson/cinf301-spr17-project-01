@@ -175,7 +175,8 @@ class MonitorManager
 		$class = $service->class;
 		$class = "$class";
 		$reflect = new ReflectionClass($class);
-		$method = $reflect->getMethod("execute");
+		$execute = $reflect->getMethod("execute");
+		$exitStatus = $reflect->getMethod("getExitStatus");
 		
 		//Get service name and port/link
 		$name = $service->parameters->name;
@@ -185,26 +186,38 @@ class MonitorManager
 		}
 		else $link = $service->parameters->link;
 		
+		//Get interval
+		$interval = $service->parameters->interval;
 		//Create new instance of the class
+		
 		$name = "$name";
 		$link = "$link";
-		$instance = new $class($this, $name, $link);
+		$interval = "$interval";
+		$data = array();
+		$data['name'] = $name;
+		$data['link'] = $link;
+		$data['interval'] = $interval;
+		$instance = new $class($this, $data);
 		
 		while(true)
 		{
-			sleep(1);
 			$this->counter += $this->GLOBAL_SPEED;
-			$method->invoke($instance);
+			$execute->invoke($instance);
 			$interval = (double)$service->parameters -> interval * 60.00;
 			
 			//Is it time to check the service?
 			if($this->counter >= $interval)
 			{
-				$method->invoke($instance);
+				$exitStatus->invoke($instance);
 				print("Logged\n");
 			}
 			
-			
+			//Is it time to exit?
+			$status = $exitStatus->invoke($instance);
+			if($status)
+			{
+				exit();
+			}
 		}
 	}
 }
