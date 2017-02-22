@@ -42,59 +42,31 @@ Port
 Port
 Port
 Port
-Web
-Web
-Web
-Web
-Port
-Port
-Port
-Port
-Port
-Port
 Port
 Port
 Web
 Web
 Port
 Port
-Web
-Web
-Web
-Web
 Port
 Port
-Web
-Web
-Web
-Web
+Web open
+Port
+Port
+Web open
+Web closed
+Web closed
 Port
 Port
 Port
 Port
-Web
-Web
-Web
-Web
+Web closed
+Web open
+Web closed
 Port
 Port
 Port
 Port
 Port
 Port
-Port
-Port
-Web
-Web
-Port
-Port
-Web
-Web
-Web
-Web
-Port
-Port
-Port
-Port
-Web
-Web
+Web open

@@ -175,8 +175,20 @@ class MonitorManager
 		$class = $service->class;
 		$class = "$class";
 		$reflect = new ReflectionClass($class);
-		$instance = new $class($this, array());
 		$method = $reflect->getMethod("execute");
+		
+		//Get service name and port/link
+		$name = $service->parameters->name;
+		if($class == "PortMonitorService")
+		{
+			$link = $service->parameters->port;
+		}
+		else $link = $service->parameters->link;
+		
+		//Create new instance of the class
+		$name = "$name";
+		$link = "$link";
+		$instance = new $class($this, $name, $link);
 		
 		while(true)
 		{
@@ -185,11 +197,14 @@ class MonitorManager
 			$method->invoke($instance);
 			$interval = (double)$service->parameters -> interval * 60.00;
 			
+			//Is it time to check the service?
 			if($this->counter >= $interval)
 			{
 				$method->invoke($instance);
 				print("Logged\n");
 			}
+			
+			
 		}
 	}
 }

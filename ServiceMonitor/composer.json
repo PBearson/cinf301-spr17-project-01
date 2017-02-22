@@ -7,7 +7,9 @@
 	{
         "psr-4": 
         {
-        	"App\\":"/home/bryan/Documents/CINF301/monitor/satan/ServiceMonitor/app/"
+		"App\\":"app/",
+		"Utilities\\":"app/GeneralUtilities/",
+		"Monitors\\":"app/Monitors/"
         }
     }
 }
