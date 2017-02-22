@@ -111,7 +111,7 @@ class MonitorManager
 		}
 		if($this->OUTPUT_PATH == "")
 		{
-			$this->OUTPUT_PATH = "output.txt";
+			$this->OUTPUT_PATH = "output.log";
 		}
 		
 		//Clear output file if the user wishes to start anew
