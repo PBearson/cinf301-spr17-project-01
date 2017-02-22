@@ -50,10 +50,7 @@ abstract class MonitorService
 	 * @param bool $success whether the result was successful
 	 */
 	protected function handleResult(bool $success)
-	{
-		//Set up signal handlers
-		pcntl_signal(SIGALRM, "handle_signal");
-		
+	{	
 		$link = $this->manager->OUTPUT_PATH;
 		
 		//Success: Log as INFO, child exits
@@ -71,7 +68,6 @@ abstract class MonitorService
 		//Fails, child exits
 		else
 		{
-			pcntl_alarm((double)$this->interval * 60);
 			$this->attempt++;
 			if($this->attempt < 3)
 			{
@@ -91,25 +87,17 @@ abstract class MonitorService
 	}
 	
 	/**
-	 * Dispatch the signals
-	 * @param unknown $signo
-	 */
-	protected function handle_signal($signo)
-	{
-		switch($signo)
-		{
-			case "SIGALRM":
-				echo "Caught SIGALRM with signo " . $signo . "\n";
-				break;
-		}
-	}
-	
-	/**
 	 * See whether the child process is ready to exit or not
 	 * @return unknown
 	 */
 	public function getExitStatus()
 	{
 		return $this->shouldExit;
+	}
+	
+	/
+	public function getAlarmStatus()
+	{
+		return $this->attempt >= 3;	
 	}
 }

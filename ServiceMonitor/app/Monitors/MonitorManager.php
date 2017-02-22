@@ -54,6 +54,7 @@ class MonitorManager
 					//To execute the service check
 					$name = $service->parameters->name;
 					$name = "$name";
+					
 					if(!in_array($name, $this->activeServices))
 					{	
 						$this->checkFrequency($service);
@@ -158,7 +159,6 @@ class MonitorManager
  		{
  			
  		}
-
 	}
 	
 	/**
@@ -188,8 +188,8 @@ class MonitorManager
 		
 		//Get interval
 		$interval = $service->parameters->interval;
-		//Create new instance of the class
 		
+		//Create new instance of the class
 		$name = "$name";
 		$link = "$link";
 		$interval = "$interval";
@@ -201,6 +201,7 @@ class MonitorManager
 		
 		while(true)
 		{
+			sleep(1);
 			$this->counter += $this->GLOBAL_SPEED;
 			$execute->invoke($instance);
 			$interval = (double)$service->parameters -> interval * 60.00;
@@ -209,16 +210,25 @@ class MonitorManager
 			if($this->counter >= $interval)
 			{
 				$exitStatus->invoke($instance);
-				print("Logged\n");
 			}
 			
 			//Is it time to exit?
-			$status = $exitStatus->invoke($instance);
-			if($status)
+			$shouldExit = $exitStatus->invoke($instance);
+			if($shouldExit)
 			{
-				exit();
+				unset($this->activeServices[$name]);
+				sleep($service->parameters->frequency * (60/$this->GLOBAL_SPEED));
+				exit("exitProcess");
 			}
 		}
+	}
+	
+	/**
+	 * Handle exit process
+	 */
+	private function exitProcess()
+	{
+		
 	}
 }
 
