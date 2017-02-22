@@ -30,6 +30,7 @@ abstract class MonitorService
 	function __construct(MonitorManager $manager, string $name, string $link)
 	{
 		$this->manager = $manager;
+		$this->name = $name;
 		$this->link = $link;
 		$attempt = 1;
 	}

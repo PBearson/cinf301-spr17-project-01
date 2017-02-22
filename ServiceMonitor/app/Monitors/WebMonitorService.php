@@ -11,10 +11,10 @@ class WebMonitorService extends MonitorService
 		$fh = @fopen($this->link, "r");
 		if (is_resource($fh))
 		{
-			$add = "Web open\n";
+			$add = "Web " . $this->name . " open\n";
 			fclose($fh);
 		}
-		else $add = "Web closed\n";
+		else $add = "Web " . $this->name . " closed\n";
 		
 		$path = $this->manager->OUTPUT_PATH;
 		$contents = file_get_contents($path) . $add;
