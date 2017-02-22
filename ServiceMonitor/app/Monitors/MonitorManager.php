@@ -29,6 +29,10 @@ class MonitorManager
 	//--config=path or -c path in the command line.
 	public $CONFIG_PATH = "";
 	
+	//The path to the output file. Specify this by running
+	//--output=path or -o path in the command line.
+	public $OUTPUT_PATH = "";
+	
 	/**
 	 * Construct the manager and run the infinite loop
 	 */
@@ -89,6 +93,11 @@ class MonitorManager
 				case "c":
 					$this->CONFIG_PATH = $value;
 					break;
+					
+				case "output":
+				case "o":
+					$this->OUTPUT_PATH = $value;
+					break;
 			}
 		}
 		//Ensure valid arguments were entered
@@ -96,6 +105,13 @@ class MonitorManager
 		if(!file_exists($this->CONFIG_PATH))
 		{	
 			exit("Error: Path " . $this->CONFIG_PATH . " is not a file.\n");
+		}
+		if($this->OUTPUT_PATH == "") $this->OUTPUT_PATH = "output.txt";
+		
+		//Create output file if it does not exist
+		if(!file_exists($this->OUTPUT_PATH))
+		{
+			exec("> $this->OUTPUT_PATH");
 		}
 	}
 	
@@ -142,11 +158,12 @@ class MonitorManager
 	{
 		//Reset the counter for the child
 		$this->counter = 0;
+		
+		//Create a new class
 		$class = $service->class;
 		$class = "$class";
 		$reflect = new ReflectionClass($class);
 		$instance = new $class(array());
-		
 	}
 }
 

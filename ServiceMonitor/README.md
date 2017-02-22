@@ -13,4 +13,6 @@ Command line arguments:
 * -c | --config:
 	* Set the path to the config file. Should be an XML file.
 
-
+* -o | --output:
+	* Set the path to the output file. All Logs will be dumped here.
+	* If the file does not exist already, one will be created.
