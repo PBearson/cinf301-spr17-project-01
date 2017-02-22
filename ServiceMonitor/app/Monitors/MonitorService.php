@@ -8,27 +8,7 @@
  */
 abstract class MonitorService
 {
-	//The service name
-	protected $service;
-	
-	//The port or web link
-	protected $link;
-	
-	//Present status - RUNNING or NOT_RESPONDING
-	protected $status;
-	
-	//Attempt number - 1, 2, 3
-	protected $attempt;
-	
-	//Attempt state - INFO, WARNING, CRITICAL
-	protected $state;
-	
-	//Time (in minutes) between checks
-	protected $frequency;
-	
-	//Time between checks of NOT_RESPONDING services
-	
-	protected $interval;
+	protected $data = array();
 	
 	/**
 	 * Execute the service - to be implemented inPortMonitorService
@@ -40,17 +20,25 @@ abstract class MonitorService
 	 * Construct a new web or port monitor service
 	 * @param array $data can include information about
 	 * the service, link, frequency, and interval
-	 * (Will only work if declared as  an array)
 	 */
-	public function __construct(array $data = NULL)
+	public function __construct(array $data)
 	{
-		if(!is_array($data)) return;
-		if(isset($data['service'])) $this->service = $data['service'];
-		if(isset($data['link'])) $this->link = $data['link'];
-		if (isset($data['frequency'])) $this->frequency = $data['frequency'];
-		if (isset($data['interval'])) $this->interval = $data['interval'];
-		$this->status = 'RUNNING';
-		$this->attempt = 1;
-		$this->state = 'INFO';
+		if(isset($data['service'])) $this->data['service'] = $data['service'];
+		if(isset($data['link'])) $this->data['link'] = $data['link'];
+		if (isset($data['frequency'])) $this->data['frequency'] = $data['frequency'];
+		if (isset($data['interval'])) $this->data['interval'] = $data['interval'];
+		if (isset($data['interval'])) $this->data['interval'] = $data['interval'];
+		if (isset($data['interval'])) $this->data['interval'] = $data['interval'];
+		$this->data['status'] = 'RUNNING';
+		$this->data['attempt'] = 1;
+		$this->data['state'] = 'INFO';
+		$this->data['ready'] = 'YES';
 	}
+	
+	public function getData()
+	{
+		return $this->data;
+	}
+	
+	
 }

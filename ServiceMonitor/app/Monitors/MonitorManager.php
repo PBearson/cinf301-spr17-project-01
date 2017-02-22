@@ -16,6 +16,8 @@ class MonitorManager
 	//The services that are currently running
 	private $activeServices = array();
 	
+	private $counter = 0;
+	
 	/**
 	 * Construct the manager and run the infinite loop
 	 */
@@ -26,10 +28,7 @@ class MonitorManager
 		while(true)
 		{
 			foreach ($parsed->services->service as $service) 
-			{
-				//Sleep for 1 second
-				sleep(1);
-				
+			{	
 				//Get the class (web or port) of the service and its parameters
 				$class = $service->class;
 				$parameters = $service->paremeters;
@@ -39,15 +38,15 @@ class MonitorManager
 				{
 					//If the service is running then check if it's time
 					//To execute the service check
-					if(array_key_exists($service->class, $this->activeServices))
-					{
-						$this->checkFrequency($service);
+					$serviceString = '$service';
+					if(array_key_exists($serviceString, $this->activeServices))
+					{	
+						$this->checkInterval($service);
 					}
 					
-					//Otherwise check if it's time to respawn the child
 					else
 					{
-						$this->checkInterval($service);
+						$this->checkFrequency($service);
 					}
 					//REFLECTION
 					//$execute = $reflect->getMethod("execute");
@@ -64,6 +63,8 @@ class MonitorManager
 	 */
 	private function checkFrequency($service)
 	{
+		sleep(1);
+		$this->counter++;
 		
 	}
 	
