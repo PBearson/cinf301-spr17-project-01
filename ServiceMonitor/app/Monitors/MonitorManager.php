@@ -78,7 +78,7 @@ class MonitorManager
 			{
 				case "speed":
 				case "s":
-					$this->GLOBAL_SPEED = $value;
+					if($this->GLOBAL_SPEED == 1) $this->GLOBAL_SPEED = $value;
 					break;
 					
 				case "config":

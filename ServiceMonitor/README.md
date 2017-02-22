@@ -23,4 +23,5 @@ Command line arguments:
 
 * -a:
 	* Automatically set the path to the config file as "../data/input.xml"
+	* Also automatically set the global speed to 200.
 	* For dev use
