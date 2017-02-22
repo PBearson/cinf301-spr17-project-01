@@ -10,13 +10,9 @@ class PortMonitorService extends MonitorService
 		$fh = @fsockopen('localhost',$this->link, $errno, $errstr, 5);
 		if (is_resource($fh))
 		{
-			$add = "Port " . $this->name . " open\n";
+			$this->handleResult(true);
 			fclose($fh);
 		}
-		else $add = "Port " . $this->name . " closed\n";
-		
-		$path = $this->manager->OUTPUT_PATH;
-		$contents = file_get_contents($path) . $add;
-		file_put_contents($path, $contents);
+		else $this->handleResult(false);
 	}
 }

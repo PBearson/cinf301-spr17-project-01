@@ -8,12 +8,16 @@
  */
 
 require_once '../../vendor/autoload.php';
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\FirePHPHandler;
 
 abstract class MonitorService
 {
 	protected $attempt;
 	protected $name;
 	protected $link;
+	protected $logger;
 	
 	/**
 	 * Execute the service - to be implemented inPortMonitorService
@@ -33,5 +37,16 @@ abstract class MonitorService
 		$this->name = $name;
 		$this->link = $link;
 		$attempt = 1;
+		$this->logger = new Logger('service_logger');
+	}
+	
+	/**
+	 * Handle the service behavior based on the latest result
+	 * Log the execution results to the output file
+	 * @param bool $success whether the result was successful
+	 */
+	protected function handleResult(bool $success)
+	{
+		print($success . "\n");
 	}
 }
