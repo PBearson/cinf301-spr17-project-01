@@ -14,24 +14,35 @@ require_once './../GeneralUtilities/Utilities.php';
 
 class MonitorManager
 {
-	//The services that are currently running. This holds 
-	//The names of the services. Assumes no duplicate names.
-	private $activeServices = array();
-	
-	//Parent counter
-	private $counter = 0;
-	
 	//The speed at which the program runs. Change this
 	//by running --speed=value or -s value in the command line
 	public $GLOBAL_SPEED = 1;
-
-	//The path to the config file. Specify this by running 
+	
+	//The path to the config file. Specify this by running
 	//--config=path or -c path in the command line.
 	public $CONFIG_PATH = "";
 	
 	//The path to the output file. Specify this by running
 	//--output=path or -o path in the command line.
 	public $OUTPUT_PATH = "";
+	
+	//The service to give priority to. This is the next
+	//service that 
+	private $priorityService;
+	
+	//The config file
+	private $configFile;
+	
+	//The services that have recently executed. Clears once 
+	//All services have executed at least once.
+	private $activeServices = array();
+	
+	//The frequencies of each service. Will change as the priority
+	//service changes
+	private $frequencies = array();
+	
+	//Parent counter
+	private $counter = 0;
 	
 	/**
 	 * Construct the manager and run the infinite loop
@@ -41,27 +52,123 @@ class MonitorManager
 		//Parse and interpret command line arguments
 		$this->parseArgs();
 		
-		$parsed = simplexml_load_file($this->CONFIG_PATH);
+		//Set config file
+		$this->configFile = simplexml_load_file($this->CONFIG_PATH);
 		
-		while(true)
-		{
-			foreach ($parsed->services->service as $service) 
-			{	
-				//Ensure only appropriate services are parsed
-				if(class_exists($service->class))
-				{
-					//If the service is running then check if it's time
-					//To execute the service check
-					$name = $service->parameters->name;
-					$name = "$name";
+		//Set target frequencies for each service
+		$this->resetFreqencies();
+		
+		//Get priority service
+		$this->priorityService = $this->getPriorityService();
+		
+		//Now run the main loop
+		while(true) $this->loop();
+		
+// 		while(true)
+// 		{
+// 			foreach ($this->configFile->services->service as $service) 
+// 			{	
+// 				//Ensure only appropriate services are parsed
+// 				if(class_exists($service->class))
+// 				{
+// 					//If the service is running then check if it's time
+// 					//To execute the service check
+// 					$name = $service->parameters->name;
+// 					$name = "$name";
 					
-					if(!in_array($name, $this->activeServices))
-					{	
-						$this->checkFrequency($service);
-					}
-				}	
+// 					if(!in_array($name, $this->activeServices))
+// 					{	
+// 						$this->checkFrequency($service);
+// 					}
+// 				}	
+// 			}
+// 		}
+	}
+	
+	/**
+	 * The parent loop. Runs the counter until the priority
+	 * service is ready to spawn.
+	 */
+	private function loop()
+	{
+		//Sleep and increment the counter
+		sleep(1);
+		$this->counter += $this->GLOBAL_SPEED;
+		
+		//Get the priority services' frequency
+		$name = $this->priorityService->parameters->name;
+		$name = "$name";
+		$frequency = $this->frequencies[$name];
+		
+		if($counter >= $frequency)
+		{
+			array_push($this->activeServices, $name);
+			$this->spawnService();
+			$this->prioritize();
+		}
+	}
+	
+	/**
+	 * Spawn the priority service and run its loop
+	 */
+	private function spawnService()
+	{
+		
+	}
+	
+	/**
+	 * Increment the frequency of the priority service
+	 * by its base (original) frequency. Then re-evaluate
+	 * which service takes priority. If all services have
+	 * spawned at least once, then reset frequencies, and
+	 * subtract from count the same as what was subtracted
+	 * from the next priority service. 
+	 * Example: Service A's freq = 15 (base 5). Counter = 13.
+	 * If all services have spawned, Service A's freq = 15 - 10 = 5.
+	 * Counter = 13 - 10 = 3. We assume Service A has priority.
+	 */
+	private function prioritize()
+	{
+		
+	}
+	
+	/**
+	 * Reset the original frequencies of each service
+	 */
+	private function resetFreqencies()
+	{
+		foreach($this->configFile->services->service as $service)
+		{
+			$name = $service->parameters->name;
+			$name = "name";
+			$targetFrequency = $service->parameters->frequency;
+			$this->frequencies[$name] = $targetFrequency;
+		}
+	}
+	
+	/**
+	 * Get the next service that should spawn. The priority
+	 * service is the one that should logically be next to spawn,
+	 * so it is picked based on the difference between its spawn
+	 * time and the global counter.
+	 */
+	private function getPriorityService()
+	{
+		$minTime = INF;
+		foreach($this->configFile->services->service as $service)
+		{
+			$name = $service->parameters->name;
+			$name = "name";
+			$frequency = $this->frequencies[$name];
+			$spawnTime = $frequency - $this->counter;
+			if($spawnTime < $minTime)
+			{
+				$minTime = $spawnTime;
+				$priorityService = $service;
 			}
 		}
+		
+		return $priorityService;
 	}
 	
 	/**
@@ -177,6 +284,7 @@ class MonitorManager
 		$reflect = new ReflectionClass($class);
 		$execute = $reflect->getMethod("execute");
 		$exitStatus = $reflect->getMethod("getExitStatus");
+		$alarmStatus = $reflect->getMethod("getAlarmStatus");
 		
 		//Get service name and port/link
 		$name = $service->parameters->name;
@@ -214,6 +322,7 @@ class MonitorManager
 			
 			//Is it time to exit?
 			$shouldExit = $exitStatus->invoke($instance);
+			$shouldAlarm = $exitStatus->invoke($instance);
 			if($shouldExit)
 			{
 				unset($this->activeServices[$name]);

@@ -21,6 +21,7 @@ abstract class MonitorService
 	protected $logger;
 	protected $interval;
 	protected $shouldExit;
+	protected $shouldAlarm;
 	
 	/**
 	 * Execute the service - to be implemented inPortMonitorService
@@ -40,7 +41,8 @@ abstract class MonitorService
 		$this->link = $data['link'];
 		$this->interval = $data['interval'];
 		$attempt = 0;
-		$shouldExit = false;
+		$this->shouldExit = false;
+		$this->shouldAlarm = true;
 		$this->logger = new Logger('service_logger');
 	}
 	
@@ -60,6 +62,7 @@ abstract class MonitorService
 			$this->logger->pushHandler($handler);
 			$this->logger->info("This service is responding");
 			$this->logger->popHandler();
+			$this->shouldAlarm = false;
 			$this->shouldExit = true;
 		}
 		
@@ -68,6 +71,7 @@ abstract class MonitorService
 		//Fails, child exits
 		else
 		{
+			$this->shouldAlarm = true;
 			$this->attempt++;
 			if($this->attempt < 3)
 			{
@@ -81,6 +85,7 @@ abstract class MonitorService
 				$this->logger->pushHandler($handler);
 				$this->logger->critical("This service has stopped responding. Maybe if you didn't suck, you could fix it.");
 				$this->shouldExit = true;
+				$this->shouldAlarm = false;
 			}
 			$this->logger->popHandler();
 		}
@@ -95,9 +100,8 @@ abstract class MonitorService
 		return $this->shouldExit;
 	}
 	
-	/
 	public function getAlarmStatus()
 	{
-		return $this->attempt >= 3;	
+		return $this->shouldAlarm;	
 	}
 }
