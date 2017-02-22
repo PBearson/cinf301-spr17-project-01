@@ -14,15 +14,20 @@ require_once './../GeneralUtilities/Utilities.php';
 
 class MonitorManager
 {
-	//The services that are currently running
+	//The services that are currently running. This holds 
+	//The names of the services. Assumes no duplicate names.
 	private $activeServices = array();
 	
 	//Parent counter
 	private $counter = 0;
 	
 	//The speed at which the program runs. Change this
-	//by running --speed=x or -s x in the command line
-	public $GLOBAL_SPEED = 1; 
+	//by running --speed=value or -s value in the command line
+	public $GLOBAL_SPEED = 1;
+
+	//The path to the config file. Specify this by running 
+	//--config=path or -c path in the command line.
+	public $CONFIG_PATH = "";
 	
 	/**
 	 * Construct the manager and run the infinite loop
@@ -32,7 +37,7 @@ class MonitorManager
 		//Parse and interpret command line arguments
 		$this->parseArgs();
 		
-		$parsed = simplexml_load_file("../data/input.xml");
+		$parsed = simplexml_load_file($this->CONFIG_PATH);
 		
 		while(true)
 		{
@@ -40,19 +45,22 @@ class MonitorManager
 			{	
 				//Get the class (web or port) of the service and its parameters
 				$class = $service->class;
-				$parameters = $service->paremeters;
+				$parameters = $service->parameters;
 				
 				//Ensure only appropriate services are parsed
 				if(class_exists($class))
 				{
 					//If the service is running then check if it's time
 					//To execute the service check
-					$serviceString = '$service';
-					if(array_key_exists($serviceString, $this->activeServices))
+					$name = $parameters->name;
+					$name = "$name";
+					if(in_array($name, $this->activeServices))
 					{	
 						$this->checkInterval($service);
 					}
 					
+					//If the service is inactive then check if it's time
+					//To respawn it
 					else
 					{
 						$this->checkFrequency($service);
@@ -81,9 +89,20 @@ class MonitorManager
 			{
 				case "speed":
 				case "s":
-					if($value > 0) $this->GLOBAL_SPEED = $value;
+					$this->GLOBAL_SPEED = $value;
+					break;
+					
+				case "config":
+				case "c":
+					$this->CONFIG_PATH = $value;
 					break;
 			}
+		}
+		//Ensure valid arguments were entered
+		if($this->GLOBAL_SPEED <= 0) $this->GLOBAL_SPEED = 1;
+		if(!file_exists($this->CONFIG_PATH))
+		{	
+			exit("Error: Path " . $this->CONFIG_PATH . " is not a file.\n");
 		}
 	}
 	
@@ -94,25 +113,35 @@ class MonitorManager
 	private function checkFrequency($service)
 	{
 		//Sleep and increment the counter
-		sleep(1/$this->GLOBAL_SPEED);
-		print($this->GLOBAL_SPEED);
-		$this->counter ++;
+		sleep(1);
+		$this->counter += $this->GLOBAL_SPEED;
+		
 		$frequency = $service->parameters->frequency * 60;
 		
-// 		//Time to spawn a new process?
-// 		if($this->counter >= $frequency)
-// 		{
-// 			//Add service to array
-// 			$serviceString = '$service';
-// 			array_push($this->activeServices, $serviceString);
-// 			$pid = pcntl_fork();
-// 			if($pid == 0) 
-// 			{
-// 				print ("Child\n");
-// 				exit();
-// 			}
-// 			else print("Parent\n");
-// 		}
+		//Time to spawn a new process?
+		if($this->counter >= $frequency)
+		{
+			//Add service name to array and fork a new process
+			$name = $service->parameters->name;
+			$name = "$name";
+			array_push($this->activeServices, $name);
+ 			$pid = pcntl_fork();
+	
+ 			//Child
+ 			if($pid == 0) 
+ 			{
+ 				print("This is a child process\n");
+ 			}
+ 			else
+ 			{
+ 				print("This is a parent process\n");
+ 			}
+		}
+ 		else
+ 		{
+ 			
+ 		}
+
 	}
 	
 	/**
