@@ -16,3 +16,11 @@ Command line arguments:
 * -o | --output:
 	* Set the path to the output file. All Logs will be dumped here.
 	* If the file does not exist already, one will be created.
+
+* -n: 
+	* Clear the output file and start fresh.
+	* Assumes the configured output path already exists, otherwise has no effect.
+
+* -a:
+	* Automatically set the path to the config file as "../data/input.xml"
+	* For dev use

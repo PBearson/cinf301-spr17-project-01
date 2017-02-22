@@ -47,26 +47,17 @@ class MonitorManager
 		{
 			foreach ($parsed->services->service as $service) 
 			{	
-				//Get the class (web or port) of the service and its parameters
-				$class = $service->class;
-				$parameters = $service->parameters;
-				
 				//Ensure only appropriate services are parsed
-				if(class_exists($class))
+				if(class_exists($service->class))
 				{
 					//If the service is running then check if it's time
 					//To execute the service check
-					$name = $parameters->name;
+					$name = $service->parameters->name;
 					$name = "$name";
 					if(!in_array($name, $this->activeServices))
 					{	
 						$this->checkFrequency($service);
 					}
-					
-					//REFLECTION
-					//$execute = $reflect->getMethod("execute");
-					//$instance = new $class;
-					//$execute->invoke($instance);
 				}	
 			}
 		}
@@ -79,9 +70,10 @@ class MonitorManager
 	{
 		$utilities = new Utilities();
 		$args = $utilities->argv;
+		$deleteOutput = false;
 		
 		foreach($args as $key=>$value)
-		{
+		{	
 			switch($key)
 			{
 				case "speed":
@@ -97,16 +89,36 @@ class MonitorManager
 				case "output":
 				case "o":
 					$this->OUTPUT_PATH = $value;
+					
+				case "n":
+					$deleteOutput = true;
+					break;
+					
+				case "a":
+					$this->CONFIG_PATH = "../data/input.xml";
+					$this->GLOBAL_SPEED = 200;
 					break;
 			}
 		}
 		//Ensure valid arguments were entered
-		if($this->GLOBAL_SPEED <= 0) $this->GLOBAL_SPEED = 1;
+		if($this->GLOBAL_SPEED <= 0) 
+		{
+			$this->GLOBAL_SPEED = 1;
+		}
 		if(!file_exists($this->CONFIG_PATH))
 		{	
 			exit("Error: Path " . $this->CONFIG_PATH . " is not a file.\n");
 		}
-		if($this->OUTPUT_PATH == "") $this->OUTPUT_PATH = "output.txt";
+		if($this->OUTPUT_PATH == "")
+		{
+			$this->OUTPUT_PATH = "output.txt";
+		}
+		
+		//Clear output file if the user wishes to start anew
+		if($deleteOutput && file_exists($this->OUTPUT_PATH))
+		{
+			file_put_contents($this->OUTPUT_PATH, "");
+		}
 		
 		//Create output file if it does not exist
 		if(!file_exists($this->OUTPUT_PATH))
@@ -158,12 +170,27 @@ class MonitorManager
 	{
 		//Reset the counter for the child
 		$this->counter = 0;
-		
+
 		//Create a new class
 		$class = $service->class;
 		$class = "$class";
 		$reflect = new ReflectionClass($class);
-		$instance = new $class(array());
+		$instance = new $class($this, array());
+		$method = $reflect->getMethod("execute");
+		
+		while(true)
+		{
+			sleep(1);
+			$this->counter += $this->GLOBAL_SPEED;
+			$method->invoke($instance);
+			$interval = (double)$service->parameters -> interval * 60.00;
+			
+			if($this->counter >= $interval)
+			{
+				$method->invoke($instance);
+				print("Logged\n");
+			}
+		}
 	}
 }
 

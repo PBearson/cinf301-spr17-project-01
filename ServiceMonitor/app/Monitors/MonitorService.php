@@ -6,9 +6,13 @@
  * @author bryan
  *
  */
+
+require_once './MonitorManager.php';
+
 abstract class MonitorService
 {
 	protected $data = array();
+	protected $manager;
 	
 	/**
 	 * Execute the service - to be implemented inPortMonitorService
@@ -18,11 +22,13 @@ abstract class MonitorService
 	
 	/**
 	 * Construct a new web or port monitor service
+	 * @param MonitorManager manager the referencing monitor manager
 	 * @param array $data can include information about
 	 * the service, link, frequency, and interval
 	 */
-	function __construct(array $data)
+	function __construct(MonitorManager $manager, array $data)
 	{
+		$this->manager = $manager;
 		if(isset($data['service'])) $this->data['service'] = $data['service'];
 		if(isset($data['link'])) $this->data['link'] = $data['link'];
 		if (isset($data['frequency'])) $this->data['frequency'] = $data['frequency'];
