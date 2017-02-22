@@ -7,7 +7,7 @@
       		<parameters>
         		<name>CheckingRandomPort</name>
         		<port>80</port>
-        		<frequency>6</frequency>
+        		<frequency>5</frequency>
         		<interval>0.2</interval>
       		</parameters>
     	</service>
@@ -22,38 +22,38 @@
     	</service>
     	<service>
     		<class>WebMonitorService</class>
-    		<paremters>
+    		<parameters>
     			<name>DoesGoogleWork</name>
     			<link>https://google.com</link>
     			<frequency>10</frequency>
     			<interval>0.5</interval>
-    		</paremters>
+    		</parameters>
     	</service>
     	<service>
     		<class>WebMonitorService</class>
-    		<paremeters>
+    		<parameters>
     			<name>DoesNotExist</name>
     			<link>https://oneoverzero.inf</link>
     			<frequency>7</frequency>
     			<interval>1.2</interval>
-    		</paremeters>
+    		</parameters>
     	</service>
     	<service>
     		<class>PortMonitorService</class>
-    		<paremeters>
+    		<parameters>
     			<name>AnotherPort</name>
     			<port>8080</port>
     			<frequency>9</frequency>
     			<interval>0.7</interval>
-    		</paremeters>
+    		</parameters>
     	</service>
     	<service>
     		<class>BlahNotAService</class>
-    		<paremeters>
+    		<parameters>
     			<name>IgnorePLS</name>
     			<unknown>Unknown</unknown>
     			<Life>42</Life>
-    		</paremeters>
+    		</parameters>
     	</service>
    	</services>
 </configuration>
