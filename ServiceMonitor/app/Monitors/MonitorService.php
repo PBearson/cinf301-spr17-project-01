@@ -38,7 +38,7 @@ abstract class MonitorService
 		$this->manager = $manager;
 		$this->name = $name;
 		$this->link = $link;
-		$attempt = 1;
+		$attempt = 0;
 		$shouldExit = false;
 		$this->logger = new Logger('service_logger');
 	}
@@ -60,6 +60,28 @@ abstract class MonitorService
 			$this->logger->info("This service is responding");
 			$this->logger->popHandler();
 			$this->shouldExit = true;
+		}
+		
+		//Failure: Increment attempt count, Log as WARNING/CRITICAL,
+		//With a responding/notresponding status. If third attempt
+		//Fails, child exits
+		else
+		{
+			$this->attempt++;
+			if($this->attempt < 3)
+			{
+				$handler = new StreamHandler($link, Logger::WARNING);
+				$this->logger->pushHandler($handler);
+				$this->logger->warning("This service is not responding");
+			}
+			else
+			{
+				$handler = new StreamHandler($link, Logger::CRITICAL);
+				$this->logger->pushHandler($handler);
+				$this->logger->critical("This service has stopped responding. Maybe if you didn't suck, you could fix it.");
+				$this->shouldExit = true;
+			}
+			$this->logger->popHandler();
 		}
 	}
 		
