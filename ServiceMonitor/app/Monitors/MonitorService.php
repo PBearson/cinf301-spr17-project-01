@@ -21,7 +21,7 @@ abstract class MonitorService
 	 * @param array $data can include information about
 	 * the service, link, frequency, and interval
 	 */
-	public function __construct(array $data)
+	function __construct(array $data)
 	{
 		if(isset($data['service'])) $this->data['service'] = $data['service'];
 		if(isset($data['link'])) $this->data['link'] = $data['link'];
@@ -32,12 +32,28 @@ abstract class MonitorService
 		$this->data['status'] = 'RUNNING';
 		$this->data['attempt'] = 1;
 		$this->data['state'] = 'INFO';
-		$this->data['ready'] = 'YES';
 	}
 	
-	public function getData()
+	/**
+	 * Retrieve a certain key from the Monitor Service
+	 * @param string $key the key
+	 * @return string|NULL returns either the value of the key
+	 * querried or null, if it does not exist
+	 */
+	public function __get(string $key)
 	{
-		return $this->data;
+		if(isset($data[$value])) return $value[$value];
+		else return null;
+	}
+	
+	/**
+	 * Set a certain key from the Monitor Service
+	 * @param string $key the key
+	 * @param string $value the value to set the key to
+	 */
+	public function __set(string $key, string $value)
+	{
+		if (isset($data[$key])) $data[$key] = $value;   
 	}
 	
 	

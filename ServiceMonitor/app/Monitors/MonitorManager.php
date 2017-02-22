@@ -54,15 +54,8 @@ class MonitorManager
 					//To execute the service check
 					$name = $parameters->name;
 					$name = "$name";
-					if(in_array($name, $this->activeServices))
+					if(!in_array($name, $this->activeServices))
 					{	
-						$this->checkInterval($service);
-					}
-					
-					//If the service is inactive then check if it's time
-					//To respawn it
-					else
-					{
 						$this->checkFrequency($service);
 					}
 					
@@ -108,6 +101,7 @@ class MonitorManager
 	
 	/**
 	 * Check if an inactive service should respawn
+	 * (PARENT PROCESS ONLY)
 	 * @param unknown $service
 	 */
 	private function checkFrequency($service)
@@ -115,7 +109,6 @@ class MonitorManager
 		//Sleep and increment the counter
 		sleep(1);
 		$this->counter += $this->GLOBAL_SPEED;
-		
 		$frequency = $service->parameters->frequency * 60;
 		
 		//Time to spawn a new process?
@@ -126,15 +119,11 @@ class MonitorManager
 			$name = "$name";
 			array_push($this->activeServices, $name);
  			$pid = pcntl_fork();
-	
+			
  			//Child
  			if($pid == 0) 
  			{
- 				print("This is a child process\n");
- 			}
- 			else
- 			{
- 				print("This is a parent process\n");
+ 				$this->checkInterval($service);
  			}
 		}
  		else
@@ -146,12 +135,20 @@ class MonitorManager
 	
 	/**
 	 * Check if an active service should execute
+	 * (CHILD PROCESS ONLY)
 	 * @param unknown $service
 	 */
 	private function checkInterval($service)
 	{
+		//Reset the counter for the child
+		$this->counter = 0;
+		$class = $service->class;
+		$class = "$class";
+		$reflect = new ReflectionClass($class);
+		$instance = new $class(array());
 		
 	}
 }
 
+//Test manager
 $manager = new MonitorManager();
