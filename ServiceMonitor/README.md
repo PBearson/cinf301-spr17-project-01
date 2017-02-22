@@ -2,7 +2,7 @@
 * Author: Bryan Pearson
 * Description: This project utilizes PHP daemons to simulate a monitoring service.
 
-+ INSTRUCTIONS: 
+* INSTRUCTIONS: 
 
 Command line arguments: 
 * -s | --speed:
