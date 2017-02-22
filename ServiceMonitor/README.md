@@ -1,10 +1,8 @@
-Name: CINF301 Service Monitor
+* Name: CINF301 Service Monitor
+* Author: Bryan Pearson
+* Description: This project utilizes PHP daemons to simulate a monitoring service.
 
-Author: Bryan Pearson
-
-Description: This project utilizes PHP daemons to simulate a monitoring service.
-
-INSTRUCTIONS
++ INSTRUCTIONS: 
 
 Command line arguments: 
 * -s | --speed:
