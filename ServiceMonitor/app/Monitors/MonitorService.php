@@ -57,7 +57,6 @@ abstract class MonitorService
 		//Success: Log as INFO, child exits
 		if($success)
 		{
-			print($this->name . " is responding!\n");
 			$handler = new StreamHandler($link, Logger::INFO);
 			$this->logger->pushHandler($handler);
 			$this->logger->info("This service is responding");
@@ -71,7 +70,6 @@ abstract class MonitorService
 		//Fails, child exits
 		else
 		{
-			print($this->name . " is not responding.\n");
 			$this->shouldAlarm = true;
 			$this->attempt++;
 			if($this->attempt < 3)
@@ -82,7 +80,6 @@ abstract class MonitorService
 			}
 			else
 			{
-				print($this->name . " is not responding and needs to restart!\n");
 				$handler = new StreamHandler($link, Logger::CRITICAL);
 				$this->logger->pushHandler($handler);
 				$this->logger->critical("This service has stopped responding. Maybe if you didn't suck, you could fix it.");

@@ -39,6 +39,15 @@
     		</parameters>
     	</service>
     	<service>
+    		<class>WebMonitorService</class>
+    		<parameters>
+    			<name>Facebook</name>
+    			<link>https://facebook.com</link>
+    			<frequency>4</frequency>
+    			<interval>0.3</interval>
+    		</parameters>
+    	</service>
+    	<service>
     		<class>PortMonitorService</class>
     		<parameters>
     			<name>AnotherPort</name>

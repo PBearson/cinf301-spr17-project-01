@@ -109,7 +109,6 @@ class MonitorManager
 		
 		//If it's time to spawn, then spawn, log the service,
 		//And get the new priority service.
- 		print($name . ": Counter is at " . $this->counter . " / " . $frequency . "\n");
 		if($this->counter >= $frequency)
 		{
 			$pid = pcntl_fork();
@@ -165,7 +164,6 @@ class MonitorManager
 			$this->resetFreqencies();
 			$new = (int)$this->frequencies[$name];
 			$diff = 60 * ($current - $new);
-			print("OLD: ". $current . ", NEW: " . $new . "\n");
 			$this->counter -= $diff;
 		}
 	}
@@ -338,10 +336,30 @@ class MonitorManager
 	}
 	
 	/**
+	 * Handle a thrown process signal
+	 * @param unknown $signo
+	 */
+	public function handle_signal($signo)
+	{
+		switch($signo)
+		{
+			case SIGCHLD:
+				print ("Caught SIGCHILD\n");
+				break;
+				
+			case SIGALRM:	
+				print("Caught SIGALRM\n");
+				break;
+		}
+	}
+	
+	/**
 	 * Handle exit process
 	 */
 	private function exitProcess()
 	{
-		print("Service has exited\n");
+		pcntl_signal(SIGCHLD, "MonitorManager::handle_signal");
+		posix_kill(posix_getpid(), SIGCHLD);
+		pcntl_signal_dispatch();
 	}
 }
