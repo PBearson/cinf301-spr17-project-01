@@ -7,7 +7,7 @@ INSTRUCTIONS:
 Command line arguments: 
 * -s | --speed:
 	* Set the program speed. 1 by default. 2 = twice as fast, 3 = thrice as fast, etc.
-	* Integers only (e.g. fractions and decimals not allowed).
+	* Also accepts fractions. 0.5 = half as fast, 0.25 = quarter as fast, etc.
 	* 0 and negative values not accepted.
 
 * -c | --config:
