@@ -1,9 +1,8 @@
 <?php 
 
-require_once __DIR__.'/../../vendor/autoload.php';
-require_once './WebMonitorService.php';
-require_once './PortMonitorService.php';
-require_once './../GeneralUtilities/Utilities.php';
+require_once __DIR__ .'/WebMonitorService.php';
+require_once __DIR__ .'/PortMonitorService.php';
+require_once __DIR__ .'/../GeneralUtilities/Utilities.php';
 
 /**
  * Model class that continuously checks if another
@@ -242,7 +241,7 @@ class MonitorManager
 					break;
 					
 				case "a":
-					$this->CONFIG_PATH = "../data/input.xml";
+					$this->CONFIG_PATH = __DIR__ ."/../data/input.xml";
 					$this->GLOBAL_SPEED = 200;
 					break;
 			}
@@ -333,7 +332,7 @@ class MonitorManager
 			{
 				unset($this->activeServices[$name]);
 				sleep($service->parameters->frequency * (60/$this->GLOBAL_SPEED));
-				exit();
+				exit($this->exitProcess());
 			}
 		}
 	}
@@ -343,9 +342,6 @@ class MonitorManager
 	 */
 	private function exitProcess()
 	{
-		
+		print("Service has exited\n");
 	}
 }
-
-//Test manager
-$manager = new MonitorManager();

@@ -7,7 +7,6 @@
  *
  */
 
-require_once '../../vendor/autoload.php';
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\FirePHPHandler;

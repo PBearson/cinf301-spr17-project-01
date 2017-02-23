@@ -1,7 +1,6 @@
 <?php
 
-require_once "../../vendor/autoload.php";
-require_once "./MonitorService.php";
+require_once __DIR__ ."/MonitorService.php";
 
 class WebMonitorService extends MonitorService
 {	
