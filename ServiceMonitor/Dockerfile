@@ -1,4 +1,4 @@
 FROM php:7.0-apache
 COPY / /var/www/html/
 CMD pull composer/composer
-#RUN composer install;
+CMD ["composer install"]
