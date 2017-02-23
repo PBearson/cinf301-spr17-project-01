@@ -326,12 +326,9 @@ class MonitorManager
 			//Is it time to exit?
 			$shouldExit = $exitStatus->invoke($instance);
 			$shouldAlarm = $exitStatus->invoke($instance);
-			if($shouldExit)
-			{
-				unset($this->activeServices[$name]);
-				sleep($service->parameters->frequency * (60/$this->GLOBAL_SPEED));
-				exit($this->exitProcess());
-			}
+			
+			if($shouldAlarm) $this->alarmProcess();
+			if($shouldExit) exit($this->exitProcess());
 		}
 	}
 	
@@ -339,7 +336,7 @@ class MonitorManager
 	 * Handle a thrown process signal
 	 * @param unknown $signo
 	 */
-	public function handle_signal($signo)
+	private function handle_signal($signo)
 	{
 		switch($signo)
 		{
@@ -351,6 +348,13 @@ class MonitorManager
 				print("Caught SIGALRM\n");
 				break;
 		}
+	}
+	
+	private function alarmProcess()
+	{
+		pcntl_signal(SIGALRM, "MonitorManager::handle_signal");
+		posix_kill(posix_getpid(), SIGALRM);
+		pcntl_signal_dispatch();
 	}
 	
 	/**

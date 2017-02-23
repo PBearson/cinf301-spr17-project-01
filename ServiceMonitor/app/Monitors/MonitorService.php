@@ -77,6 +77,8 @@ abstract class MonitorService
 				$handler = new StreamHandler($link, Logger::WARNING);
 				$this->logger->pushHandler($handler);
 				$this->logger->warning("This service is not responding");
+				$this->shouldExit = false;
+				$this->shouldAlarm = true;
 			}
 			else
 			{
