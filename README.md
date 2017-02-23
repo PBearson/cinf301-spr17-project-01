@@ -1,8 +1,13 @@
 * Name: CINF301 Service Monitor
 * Author: Bryan Pearson
-* Description: This project utilizes PHP daemons to simulate a monitoring service.
+* Description: This project utilizes PHP daemons to simulate a monitoring service. Unfortunately Docker was not implemented in time, but ideally, Docker would have been used to automatically configure and run everything.
 
-INSTRUCTIONS: 
+INSTRUCTIONS:
+
+To run the program, do the following:
+* Navigate to ServiceMonitor directory
+* Run 'composer update' or 'composer install' to install dependencies.
+* Run 'php Monitor.php' - you MUST specify the path to the config file using -c
 
 Command line arguments: 
 * -s | --speed:
