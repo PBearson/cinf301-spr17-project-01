@@ -30,6 +30,8 @@ class MonitorManager
 	//service that 
 	private $priorityService;
 	
+	private $parentPID;
+	
 	//The config file
 	private $configFile;
 	
@@ -61,6 +63,9 @@ class MonitorManager
 		//Get priority service
 		$this->priorityService = $this->getPriorityService();
 		
+		//Get parent pid
+		$this->parentPID = getmypid();
+		
 		//Now run the main loop
 		while(true) $this->loop();
 		
@@ -91,29 +96,28 @@ class MonitorManager
 	 */
 	private function loop()
 	{
+		//Ensure this is the parent process
+		if(getmypid() != $this->parentPID) return;
+		
 		//Sleep and increment the counter
-		sleep(1);
-		$this->counter += $this->GLOBAL_SPEED;
+		usleep(1000000 / $this->GLOBAL_SPEED);
+		$this->counter++;
 		
 		//Get the priority services' frequency
 		$name = $this->priorityService->parameters->name;
 		$name = "$name";
-		$frequency = $this->frequencies[$name];
+		$frequency = (int)$this->frequencies[$name] * 60;
 		
-		if($counter >= $frequency)
+		//If it's time to spawn, then spawn, log the service,
+		//And get the new priority service.
+ 		print($name . ": Counter is at " . $this->counter . " / " . $frequency . "\n");
+		if($this->counter >= $frequency)
 		{
+			$pid = pcntl_fork();
+			if($pid == 0) $this->checkInterval($this->priorityService);
 			array_push($this->activeServices, $name);
-			$this->spawnService();
 			$this->prioritize();
 		}
-	}
-	
-	/**
-	 * Spawn the priority service and run its loop
-	 */
-	private function spawnService()
-	{
-		
 	}
 	
 	/**
@@ -129,7 +133,42 @@ class MonitorManager
 	 */
 	private function prioritize()
 	{
+		//Increment the priority service
+		$name = $this->getPriorityService()->parameters->name;
+		$name = "$name";
+		$base = (int) $this->getPriorityService()->parameters->frequency;
+		$current = (int)$this->frequencies[$name];
+		$current += $base;
+		$this->frequencies[$name] = "$current";
 		
+		//Get the new priority service
+		$this->priorityService = $this->getPriorityService();
+		
+		//See if all services have spawned
+		$spawnCount = 0;
+		$serviceCount = 0;
+		foreach($this->configFile->services->service as $service)
+		{
+			$serviceCount++;
+			$name = $service->parameters->name;
+			$name = "$name";
+			$baseFrequency = $service->parameters->frequency;
+			$currentFrequency = $this->frequencies[$name];
+			if($baseFrequency < $currentFrequency || !class_exists($service->class)) $spawnCount++;
+		}
+
+		//If all services have spawned then reset frequencies
+		if($spawnCount == $serviceCount)
+		{
+			$name = $this->getPriorityService()->parameters->name;
+			$name = "$name";
+			$current = (int)$this->frequencies[$name];
+			$this->resetFreqencies();
+			$new = (int)$this->frequencies[$name];
+			$diff = 60 * ($current - $new);
+			print("OLD: ". $current . ", NEW: " . $new . "\n");
+			$this->counter -= $diff;
+		}
 	}
 	
 	/**
@@ -140,9 +179,9 @@ class MonitorManager
 		foreach($this->configFile->services->service as $service)
 		{
 			$name = $service->parameters->name;
-			$name = "name";
+			$name = "$name";
 			$targetFrequency = $service->parameters->frequency;
-			$this->frequencies[$name] = $targetFrequency;
+			$this->frequencies[$name] = (int)$targetFrequency;
 		}
 	}
 	
@@ -158,10 +197,10 @@ class MonitorManager
 		foreach($this->configFile->services->service as $service)
 		{
 			$name = $service->parameters->name;
-			$name = "name";
+			$name = "$name";
 			$frequency = $this->frequencies[$name];
 			$spawnTime = $frequency - $this->counter;
-			if($spawnTime < $minTime)
+			if($spawnTime < $minTime && class_exists($service->class))
 			{
 				$minTime = $spawnTime;
 				$priorityService = $service;
@@ -236,39 +275,6 @@ class MonitorManager
 	}
 	
 	/**
-	 * Check if an inactive service should respawn
-	 * (PARENT PROCESS ONLY)
-	 * @param unknown $service
-	 */
-	private function checkFrequency($service)
-	{
-		//Sleep and increment the counter
-		sleep(1);
-		$this->counter += $this->GLOBAL_SPEED;
-		$frequency = $service->parameters->frequency * 60;
-		
-		//Time to spawn a new process?
-		if($this->counter >= $frequency)
-		{
-			//Add service name to array and fork a new process
-			$name = $service->parameters->name;
-			$name = "$name";
-			array_push($this->activeServices, $name);
- 			$pid = pcntl_fork();
-			
- 			//Child
- 			if($pid == 0) 
- 			{
- 				$this->checkInterval($service);
- 			}
-		}
- 		else
- 		{
- 			
- 		}
-	}
-	
-	/**
 	 * Check if an active service should execute
 	 * (CHILD PROCESS ONLY)
 	 * @param unknown $service
@@ -309,8 +315,8 @@ class MonitorManager
 		
 		while(true)
 		{
-			sleep(1);
-			$this->counter += $this->GLOBAL_SPEED;
+			usleep(1000000 / $this->GLOBAL_SPEED);
+			$this->counter++;
 			$execute->invoke($instance);
 			$interval = (double)$service->parameters -> interval * 60.00;
 			
@@ -327,7 +333,7 @@ class MonitorManager
 			{
 				unset($this->activeServices[$name]);
 				sleep($service->parameters->frequency * (60/$this->GLOBAL_SPEED));
-				exit("exitProcess");
+				exit();
 			}
 		}
 	}
